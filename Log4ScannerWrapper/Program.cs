@@ -123,7 +123,7 @@ namespace Log4ScannerWrapper
                         Console.WriteLine($"Job ID--> {job.Members["Id"].Value} Job State--> {job.Members["JobStateInfo"].Value} Server--> {job.Members["Location"].Value}");
                        
                     }
-                    System.Threading.Thread.Sleep(1000);
+                    System.Threading.Thread.Sleep(3000);
                     Console.Clear();
                 }
 
