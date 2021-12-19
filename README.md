@@ -18,6 +18,7 @@
         
         4 Thats it!! all done, now just collect scans output from remote servers as you have given in the Step 3.
         
+        ** Note If you get VCRUNTIME140.dll not found error, install Visual C++ Redistributable. as per LogPresso Github
         
         ** Command Mandatory Parameters
 ![alt text](https://github.com/prax78/Log4ScannerWrapper/blob/master/log4jscanner1.PNG)
