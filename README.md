@@ -20,18 +20,18 @@
         
         
         ** Command Mandatory Parameters
-        ![alt text](https://github.com/prax78/Log4ScannerWrapper/blob/master/log4jscanner1.PNG)
+![alt text](https://github.com/prax78/Log4ScannerWrapper/blob/master/log4jscanner1.PNG)
         
         ** First this will copy the standalone scanner from Logpresso to multiple servers and then PS Invoke-Command to run the same on target servers as Job.
            You can watch job status runing in parallel as shown below.
-        ![alt text](https://github.com/prax78/Log4ScannerWrapper/blob/master/log4jscanner2.PNG)
+![alt text](https://github.com/prax78/Log4ScannerWrapper/blob/master/log4jscanner2.PNG)
            
         ** Finished Screen, once it is finished collect it from the given Output location.
-        ![alt text](https://github.com/prax78/Log4ScannerWrapper/blob/master/log4jscanner3.PNG)
+![alt text](https://github.com/prax78/Log4ScannerWrapper/blob/master/log4jscanner3.PNG)
         
         ** Output Location Sample
-        ![alt text](https://github.com/prax78/Log4ScannerWrapper/blob/master/log4jscanner4.PNG)
+![alt text](https://github.com/prax78/Log4ScannerWrapper/blob/master/log4jscanner4.PNG)
         
         ** Sample server.txt file with target server names.
-        ![alt text](https://github.com/prax78/Log4ScannerWrapper/blob/master/log4jscanner5.PNG)
+![alt text](https://github.com/prax78/Log4ScannerWrapper/blob/master/log4jscanner5.PNG)
         
