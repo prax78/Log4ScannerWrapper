@@ -19,9 +19,9 @@
         4 Thats it!! all done, now just collect scans output from remote servers as you have given in the Step 3.
         
         ** Note If you get VCRUNTIME140.dll not found error, install Visual C++ Redistributable. as per LogPresso Github
-        
+ ![alt text](https://github.com/prax78/Log4ScannerWrapper/blob/master/log4jscanner1.PNG)
         ** Command Mandatory Parameters
-![alt text](https://github.com/prax78/Log4ScannerWrapper/blob/master/log4jscanner1.PNG)
+
         
         ** First this will copy the standalone scanner from Logpresso to multiple servers and then PS Invoke-Command to run the same on target servers as Job.
            You can watch job status runing in parallel as shown below.
