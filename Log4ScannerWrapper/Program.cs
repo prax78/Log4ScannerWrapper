@@ -12,6 +12,8 @@ namespace Log4ScannerWrapper
     {
         static void Main(string[] args)
         {
+           
+            
 
             if (args.Count() == 4)
             {
@@ -23,7 +25,7 @@ namespace Log4ScannerWrapper
                 {
                     CopyExeFileToRemoteServer(exeFile, computerList);
                     try { InvokePSCommand(exeFile, arguements, outputFile, System.IO.File.ReadAllLines(computerList)); }
-                    catch (AggregateException ex){ Console.WriteLine(ex.Message); }
+                    catch (AggregateException ex){Console.ForegroundColor=ConsoleColor.Red; Console.WriteLine($"ERROR {String.Join(":",ex.InnerExceptions.ToString())}"); Console.ForegroundColor = ConsoleColor.White; }
                     
                 }
                 
@@ -46,16 +48,16 @@ namespace Log4ScannerWrapper
                 bool exist=false;
                 foreach (var comp in System.IO.File.ReadAllLines(computers))
                 {
-                    Console.WriteLine($"Copying {exe} to {comp}");
+                    Console.WriteLine($"Copying {exe} to {comp}\n\n");
                     try {  exist = System.IO.Directory.Exists($"\\\\{comp}\\c$\\temp");
                      
                     }
-                    catch (Exception ex) { Console.WriteLine(ex.Message); }
+                    catch (Exception ex) { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"Error { ex.Message}"); Console.ForegroundColor = ConsoleColor.White; }
                     
                     if (exist)
                     {
                         try { System.IO.File.Copy(exe, $"\\\\{comp}\\c$\\temp\\log4j2-scan.exe", true);  }
-                        catch (Exception ex) { Console.WriteLine(ex.Message); }
+                        catch (Exception ex) { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"ERROR {ex.Message}" ); Console.ForegroundColor = ConsoleColor.White; }
 
                     }
                    else
@@ -72,7 +74,8 @@ namespace Log4ScannerWrapper
                         }
                         catch (Exception e)
                         {
-                            System.Console.WriteLine(e.Message);
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            System.Console.WriteLine($"{e.Message}"); Console.ForegroundColor = ConsoleColor.White; ;
                         }
 
                         }
@@ -93,45 +96,66 @@ namespace Log4ScannerWrapper
             {
                 rs.Open();
 
-                var comd = $"c:\\temp\\log4j2-scan.exe {args} |out-file {output}\\{Environment.MachineName}.txt";
-                Console.WriteLine(comd);
-                var myscript = ScriptBlock.Create(comd);
+               
+                
                 PSDataCollection<PSObject> jobCol = new PSDataCollection<PSObject>();
                 PSDataCollection<PSObject> checkjobCol = new PSDataCollection<PSObject>();
-         
+                Console.WriteLine(Environment.NewLine);
                 foreach (var computername in computers)
                 {
+                    var comd = $"c:\\temp\\log4j2-scan.exe {args} > c:\\temp\\{computername}.txt";
+                    Console.WriteLine($"Executing {comd}\n\n");
+                    var myscript = ScriptBlock.Create(comd);
                     Console.WriteLine(computername);
                     using (PowerShell invokePS = PowerShell.Create().AddCommand("Invoke-Command").AddParameter("ScriptBlock", myscript).AddParameter("ComputerName", computername).AddParameter("AsJob"))
                     {
                        invokePS.Runspace = rs;
 
 
-
-                        IAsyncResult asyncResult  = invokePS.BeginInvoke<PSObject,PSObject>(null, jobCol);
-                       asyncResult.AsyncWaitHandle.WaitOne();
+                        try
+                        {
+                            IAsyncResult asyncResult = invokePS.BeginInvoke<PSObject, PSObject>(null, jobCol);
+                            asyncResult.AsyncWaitHandle.WaitOne();
+                        }
+                        catch (Exception ex) { Console.ForegroundColor = ConsoleColor.Red;Console.WriteLine($"{ex.Message} ");Console.ForegroundColor = ConsoleColor.White; }
 
                     }
                     
                 }
-                
-                
-               while(jobCol.Any(item=>item.Members["JobStateInfo"].Value.ToString()=="Running"))
+               
+
+                while (jobCol.Any(item=>item.Members["JobStateInfo"].Value.ToString()=="Running"))
                 {
                     foreach (var job in jobCol)
                     {
-                        Console.WriteLine($"Job ID--> {job.Members["Id"].Value} Job State--> {job.Members["JobStateInfo"].Value} Server--> {job.Members["Location"].Value}");
+                        Console.WriteLine($"Job ID--> {job.Members["Id"].Value} :: Job State--> {job.Members["JobStateInfo"].Value} :: Server--> {job.Members["Location"].Value}\n");
                        
                     }
                     System.Threading.Thread.Sleep(3000);
                     Console.Clear();
                 }
 
+                GetResultData(output,computers);
+                Console.WriteLine(Environment.NewLine);
                 Console.WriteLine($"All done Thank you, collect your output {output} ");
+               
 
                
 
 
+            }
+        }
+
+        static void GetResultData(string outputdata,string[] computers)
+        {
+            foreach(var computer in computers)
+            {
+                try
+                {
+                    Console.WriteLine($"Fetching output file from {computer}");
+                    System.IO.File.Copy($"\\\\{computer}\\c$\\temp\\{computer}.txt", $"{outputdata}\\{computer}.txt",true);
+                }
+                catch (Exception ee) { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"ERROR {ee.Message}"); Console.ForegroundColor = ConsoleColor.White; }   
             }
         }
     }
