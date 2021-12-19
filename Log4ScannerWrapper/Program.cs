@@ -24,8 +24,8 @@ namespace Log4ScannerWrapper
                 if (System.IO.File.Exists(exeFile) && System.IO.File.Exists(computerList))
                 {
                     CopyExeFileToRemoteServer(exeFile, computerList);
-                    try { InvokePSCommand(exeFile, arguements, outputFile, System.IO.File.ReadAllLines(computerList)); }
-                    catch (AggregateException ex){Console.ForegroundColor=ConsoleColor.Red; Console.WriteLine($"ERROR {String.Join(":",ex.InnerExceptions.ToString())}"); Console.ForegroundColor = ConsoleColor.White; }
+                    InvokePSCommand(exeFile, arguements, outputFile, System.IO.File.ReadAllLines(computerList)); 
+                   
                     
                 }
                 
@@ -92,6 +92,7 @@ namespace Log4ScannerWrapper
         }
         static void InvokePSCommand(String exe, String args, String output, String[] computers)
         {
+        
             using (Runspace rs = RunspaceFactory.CreateRunspace())
             {
                 rs.Open();
@@ -135,8 +136,35 @@ namespace Log4ScannerWrapper
                     Console.Clear();
                 }
 
-                GetResultData(output,computers);
                 Console.WriteLine(Environment.NewLine);
+                foreach(var job in jobCol)
+                {
+
+                    using (PowerShell FailedServesJob = PowerShell.Create().AddCommand("Get-Job").AddParameter("Id", job.Members["Id"].Value))
+                    {
+                        FailedServesJob.Runspace = rs;
+                        try
+                        {
+                            IAsyncResult failed = FailedServesJob.BeginInvoke<PSObject, PSObject>(null, checkjobCol);
+                            failed.AsyncWaitHandle.WaitOne();
+                        }
+                        catch (Exception ex) { Console.ForegroundColor = ConsoleColor.Red;Console.WriteLine($"ERROR {ex.Message}");Console.ForegroundColor = ConsoleColor.White; }
+                    }
+
+                }
+                GetResultData(output, computers);
+                Console.Clear();
+                foreach(var job in checkjobCol)
+                {
+                    if(job.Members["JobStateInfo"].Value.ToString()=="Failed")
+                    {Console.ForegroundColor=ConsoleColor.Red; Console.WriteLine($"Failed {job.Members["Location"].Value.ToString()} Either WINRM Not Running or Missing VC++ runtime or Server Down"); Console.ResetColor(); }
+
+                    
+                    
+                }
+                Console.WriteLine(Environment.NewLine);
+
+                
                 Console.WriteLine($"All done Thank you, collect your output {output} ");
                
 
