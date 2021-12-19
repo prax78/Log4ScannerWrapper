@@ -5,7 +5,7 @@
     This is a C# wrapper for the Log4j2Scan tool that can be found here https://github.com/logpresso/CVE-2021-44228-Scanner/
     Log4J2-Scan is an executable from the LogPresso that helps you in finding Log4J vulnerable files on servers.
     Log4J2-Scan  is a standalone executable, so Windows Server Admin has to take this to multiple servers to scan Windows servers for the vulnerable log4J files on it.
-      To run it on multiple servers from  one source Windows servers, I have created this tool so that you can run Log4J2-Scan tool and multiple servers and collect data.
+      To run it on multiple servers from  one source Windows servers, I have created this tool so that you can run Log4J2-Scan tool on multiple servers and collect data.
       
        How To use this to run on multiple servers:
         1 Download log4j2-scan 2.3.2 (Windows x64, 7z) from https://github.com/logpresso/CVE-2021-44228-Scanner.
