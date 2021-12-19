@@ -1,6 +1,6 @@
 # Log4ScannerWrapper
 
-** Log4ScannerWrapper [Windows only]
+** Log4ScannerWrapper V 0.01[Windows only]
 
     This is a C# wrapper for the Log4j2Scan tool that can be found here https://github.com/logpresso/CVE-2021-44228-Scanner/
     Log4J2-Scan is an executable from the LogPresso that helps you in finding Log4J vulnerable files on servers.
