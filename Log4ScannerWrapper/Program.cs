@@ -62,11 +62,10 @@ namespace Log4ScannerWrapper
                         {
                         try
                         {
-                           // Console.WriteLine($"\\\\{comp}\\c$\\temp");
+                          
                           
                             System.IO.Directory.CreateDirectory($"\\\\{comp}\\c$\\temp");
 
-                            //  System.IO.File.Copy(exe, $"\\\\{comp}\\c$\\temp\\",true);
                           
                             System.IO.File.Copy(exe, $"\\\\{comp}\\c$\\temp\\log4j2-scan.exe", true);
 
