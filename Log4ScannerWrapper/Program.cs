@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
+using System.IO;
 
 namespace Log4ScannerWrapper
 {
@@ -41,23 +42,31 @@ namespace Log4ScannerWrapper
         }
         static void CopyExeFileToRemoteServer(String exe, String computers)
         {
+            if(File.Exists("Log4ScannerWrapper.log") )
+            {
+                File.Delete("Log4ScannerWrapper.log");
+            }
 
 
-            if(System.IO.File.Exists(computers))
+            if (System.IO.File.Exists(computers))
             { 
-                bool exist=false;
+                
                 foreach (var comp in System.IO.File.ReadAllLines(computers))
                 {
                     Console.WriteLine($"Copying {exe} to {comp}\n\n");
-                    try {  exist = System.IO.Directory.Exists($"\\\\{comp}\\c$\\temp");
-                     
-                    }
-                    catch (Exception ex) { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"Error { ex.Message}"); Console.ForegroundColor = ConsoleColor.White; }
                     
-                    if (exist)
+                    if (System.IO.Directory.Exists($"\\\\{comp}\\c$\\temp"))
                     {
-                        try { System.IO.File.Copy(exe, $"\\\\{comp}\\c$\\temp\\log4j2-scan.exe", true);  }
-                        catch (Exception ex) { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"ERROR {ex.Message}" ); Console.ForegroundColor = ConsoleColor.White; }
+                        try { System.IO.File.Copy(exe, $"\\\\{comp}\\c$\\temp\\log4j2-scan.exe", true);
+                            //File.AppendAllText("Log4ScannerWrapper.log", $"Copying EXE File to {comp}");
+                            //File.AppendAllText("Log4ScannerWrapper.log", Environment.NewLine);
+
+                        }
+                        catch (Exception ex) { 
+                            //File.AppendAllText("Log4ScannerWrapper.log", $"Copying EXE File to {comp} FAILED");
+                            //File.AppendAllText("Log4ScannerWrapper.log", Environment.NewLine);
+                            Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"ERROR {ex.Message}"); Console.ForegroundColor = ConsoleColor.White;
+                        }
 
                     }
                    else
@@ -70,12 +79,16 @@ namespace Log4ScannerWrapper
 
                           
                             System.IO.File.Copy(exe, $"\\\\{comp}\\c$\\temp\\log4j2-scan.exe", true);
+                            //File.AppendAllText("Log4ScannerWrapper.log", $"Copying EXE File to {comp}");
+                            //File.AppendAllText("Log4ScannerWrapper.log", Environment.NewLine);
 
                         }
                         catch (Exception e)
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
                             System.Console.WriteLine($"{e.Message}"); Console.ForegroundColor = ConsoleColor.White; ;
+                            //File.AppendAllText("Log4ScannerWrapper.log", $"Copying EXE File to {comp} FAILED");
+                            //File.AppendAllText("Log4ScannerWrapper.log", Environment.NewLine);
                         }
 
                         }
@@ -106,6 +119,8 @@ namespace Log4ScannerWrapper
                 {
                     var comd = $"c:\\temp\\log4j2-scan.exe {args} > c:\\temp\\{computername}.txt";
                     Console.WriteLine($"Executing {comd}\n\n");
+                    //File.AppendAllText("Log4ScannerWrapper.log", $"EXECUTING {computername}");
+                    //File.AppendAllText("Log4ScannerWrapper.log", Environment.NewLine);
                     var myscript = ScriptBlock.Create(comd);
                     Console.WriteLine(computername);
                     using (PowerShell invokePS = PowerShell.Create().AddCommand("Invoke-Command").AddParameter("ScriptBlock", myscript).AddParameter("ComputerName", computername).AddParameter("AsJob"))
@@ -118,7 +133,9 @@ namespace Log4ScannerWrapper
                             IAsyncResult asyncResult = invokePS.BeginInvoke<PSObject, PSObject>(null, jobCol);
                             asyncResult.AsyncWaitHandle.WaitOne();
                         }
-                        catch (Exception ex) { Console.ForegroundColor = ConsoleColor.Red;Console.WriteLine($"{ex.Message} ");Console.ForegroundColor = ConsoleColor.White; }
+                        catch (Exception ex) { Console.ForegroundColor = ConsoleColor.Red;Console.WriteLine($"{ex.Message} ");Console.ForegroundColor = ConsoleColor.White;
+                            
+                        }
 
                     }
                     
@@ -157,7 +174,11 @@ namespace Log4ScannerWrapper
                 foreach(var job in checkjobCol)
                 {
                     if(job.Members["JobStateInfo"].Value.ToString()=="Failed")
-                    {Console.ForegroundColor=ConsoleColor.Red; Console.WriteLine($"Failed {job.Members["Location"].Value.ToString()} Either WINRM Not Running or Missing VC++ runtime or Server Down"); Console.ResetColor(); }
+                    {Console.ForegroundColor=ConsoleColor.Red; Console.WriteLine($"Failed {job.Members["Location"].Value.ToString()} Either WINRM Not Running or Missing VC++ runtime or Server Down"); Console.ResetColor();
+
+                        //File.AppendAllText("Log4ScannerWrapper.log", $"Failed {job.Members["Location"].Value.ToString()}");
+                        //File.AppendAllText("Log4ScannerWrapper.log", Environment.NewLine);
+                    }
 
                     
                     
@@ -182,8 +203,13 @@ namespace Log4ScannerWrapper
                 {
                     Console.WriteLine($"Fetching output file from {computer}");
                     System.IO.File.Copy($"\\\\{computer}\\c$\\temp\\{computer}.txt", $"{outputdata}\\{computer}.txt",true);
+                    //File.AppendAllText("Log4ScannerWrapper.log", $"Copying \\\\{computer}\\c$\\temp\\{computer}.txt to {outputdata} ");
+                    //File.AppendAllText("Log4ScannerWrapper.log", Environment.NewLine);
                 }
-                catch (Exception ee) { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"ERROR {ee.Message}"); Console.ForegroundColor = ConsoleColor.White; }   
+                catch (Exception ee) { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"ERROR {ee.Message}"); Console.ForegroundColor = ConsoleColor.White;
+                    //File.AppendAllText("Log4ScannerWrapper.log", $"{ee.Message} {computer}");
+                    //File.AppendAllText("Log4ScannerWrapper.log", Environment.NewLine);
+                }   
             }
         }
     }
